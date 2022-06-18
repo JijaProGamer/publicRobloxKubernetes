@@ -56,18 +56,16 @@ local function waitForMessage(method)
 	local message
 	local finished = false
 
-	print(method)
-
 	local Connection ; Connection = WebSocket.OnMessage:Connect(function(Message)
 		print(message)
 		if Message.method == method then
+			finished = true
 			message = Message
 			Connection:Disconnect()
 		end
 	end)
 
 	repeat 
-		print(1)
 		task.wait(0.1)
 	until finished
 	
@@ -110,13 +108,11 @@ kubernetes.joinJobId = function(target, placeId, jobId)
 end
 
 kubernetes.clients = function()
+	local response = waitForMessage("clients")
+
 	sendMessage({
 		method = "clients"
 	})
-
-	local response = waitForMessage("clients")
-
-	print(response)
 
 	return response
 end
