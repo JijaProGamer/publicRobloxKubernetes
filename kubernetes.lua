@@ -62,8 +62,4 @@ kubernetes.init = function(ip)
 	sendMessage({method = "loadScript", target = "all", script = "print(true)"})
 end
 
-kubernetes.onEvent:Connect(print)
-
-kubernetes.init("ws://localhost:9452")
-
 return kubernetes
