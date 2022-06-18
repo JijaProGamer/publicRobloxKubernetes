@@ -53,13 +53,15 @@ local function handleMessage(msg)
 end
 
 local function waitForMessage(method)
-	local latestMessage
-
-	repeat
-		latestMessage = WebSocket.OnMessage:Wait()
-	until latestMessage and latestMessage.method == method
+	local message
+	local Connection ; Connection = WebSocket.OnMessage:Connect(function(Message)
+		if Message.method == method then
+			message = Message
+			Connection:Disconnect()
+		end
+	end)
 	
-	return latestMessage
+	return message
 end
 
 kubernetes.onEvent = MessageEvent.Event
