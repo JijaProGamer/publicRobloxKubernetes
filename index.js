@@ -37,13 +37,15 @@ function parseJson(json) {
 }
 
 function send(client, message) {
-    if (client == "all") {
-        wss.clients.forEach((ws) => {
-            ws.send(JSON.stringify(message))
-        })
-    } else {
-        clients[client].ws.send(JSON.stringify(message))
-    }
+    setTimeout(() => {
+        if (client == "all") {
+            wss.clients.forEach((ws) => {
+                ws.send(JSON.stringify(message))
+            })
+        } else {
+            clients[client].ws.send(JSON.stringify(message))
+        }
+    }, 100)
 }
 
 function sendError(ws, code, error) {
@@ -120,7 +122,6 @@ async function handleClient(ws, message) {
                     isMaster: clients[client].isMaster,
                 }
             }
-
             send(message.client, {
                 method: "clients",
                 clients: curatedClientsList,

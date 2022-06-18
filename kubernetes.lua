@@ -113,6 +113,14 @@ kubernetes.clients = function()
 	return response
 end
 
+kubernetes.localClient = function()
+	sendMessage({ method = "clients" })
+	local clients = waitForMessage("clients")
+	local response = clients[Players.LocalPlayer.Name]
+
+	return response
+end
+
 kubernetes.broadcast = function(message)
 	sendMessage({
 		method = "broadcast",
