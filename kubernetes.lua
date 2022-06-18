@@ -107,8 +107,6 @@ kubernetes.joinJobId = function(target, placeId, jobId)
 end
 
 kubernetes.clients = function()
-	print(1)
-	
 	sendMessage({ method = "clients" })
 	local response = waitForMessage("clients")
 
