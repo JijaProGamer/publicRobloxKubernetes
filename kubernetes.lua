@@ -10,6 +10,7 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
 local MessageEvent = Instance.new("BindableEvent")
+local ErrorEvent = Instance.new("BindableEvent")
 
 local function combine(a1, a2)
 	local new = {}
@@ -25,7 +26,7 @@ local function combine(a1, a2)
 	return new
 end
 
-function sendMessage(original) 
+local function sendMessage(original) 
 	local message = combine(original,{
 		client = Players.LocalPlayer.Name,
 		["X-Forwarded-For"] = "RKBS",
@@ -34,11 +35,10 @@ function sendMessage(original)
 	WebSocket:Send(HttpService:JSONEncode(message))
 end
 
-function handleMessage(msg)
+local function handleMessage(msg)
 	local message = HttpService:JSONDecode(msg)
 	if message.error then
-		warn(message.errorCode)
-		return warn(message.error)
+		ErrorEvent:Fire(message)
 	end
 
 	if message.method == "loadScript" then
@@ -52,14 +52,76 @@ function handleMessage(msg)
 	MessageEvent:Fire(message.method, message)
 end
 
+local function waitForMessage(method)
+	local latestMessage
+
+	repeat
+		latestMessage = WebSocket.OnMessage:Wait()
+	until latestMessage and latestMessage.method == method
+	
+	return latestMessage
+end
+
 kubernetes.onEvent = MessageEvent.Event
+kubernetes.onError = ErrorEvent.Event
 
 kubernetes.init = function(ip)
 	WebSocket = websocketLibrary.connect(ip)
 	sendMessage({method = "register", isMaster = "auto"})
+	
 	WebSocket.OnMessage:Connect(handleMessage)
+end
 
-	sendMessage({method = "loadScript", target = "all", script = "print(true)"})
+kubernetes.loadScript = function(target, scriptToSend)
+	sendMessage({
+		method = "loadScript",
+		target = target,
+		script = scriptToSend
+	})
+end
+
+kubernetes.joinGame = function(target, placeId)
+	sendMessage({
+		method = "joinGame",
+		target = target,
+		placeId = placeId
+	})
+end
+
+kubernetes.joinJobId = function(target, placeId, jobId)
+	sendMessage({
+		method = "joinJobId",
+		target = target,
+		placeId = placeId,
+		jobId = jobId
+	})
+end
+
+kubernetes.clients = function()
+	sendMessage({
+		method = "clients"
+	})
+
+	local response = waitForMessage("clients")
+
+	print(response)
+
+	return response
+end
+
+kubernetes.broadcast = function(message)
+	sendMessage({
+		method = "broadcast",
+		message = message
+	})
+end
+
+kubernetes.sendMessage = function(target, message)
+	sendMessage({
+		method = "sendMessage",
+		target = target,
+		message = message
+	})
 end
 
 return kubernetes

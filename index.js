@@ -136,7 +136,7 @@ async function handleClient(ws, message) {
             break;
         case "sendMessage":
             send(message.target, {
-                method: "singleMessage",
+                method: "sendMessage",
                 caller: message.client,
                 message: message.message,
             })
