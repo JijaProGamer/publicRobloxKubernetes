@@ -45,7 +45,7 @@ function send(client, message) {
         } else {
             clients[client].ws.send(JSON.stringify(message))
         }
-    }, 100)
+    }, 500)
 }
 
 function sendError(ws, code, error) {

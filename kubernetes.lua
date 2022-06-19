@@ -99,14 +99,14 @@ end
 
 kubernetes.clients = function()
 	sendMessage({ method = "clients" })
-	local response = waitForMessage("clients")
+	local response = waitForMessage("clients").clients
 
 	return response
 end
 
 kubernetes.localClient = function()
 	sendMessage({ method = "clients" })
-	local clients = waitForMessage("clients")
+	local clients = waitForMessage("clients").clients
 	local response = clients[Players.LocalPlayer.Name]
 
 	return response
