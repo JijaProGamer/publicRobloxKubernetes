@@ -54,19 +54,10 @@ end
 
 local function waitForMessage(method)
 	local message
-	local finished = false
-
-	local Connection ; Connection = WebSocket.OnMessage:Connect(function(Message)
-		if Message.method == method then
-			finished = true
-			message = Message
-			Connection:Disconnect()
-		end
-	end)
-
-	repeat 
-		task.wait(0.1)
-	until finished
+	
+	repeat
+		message = WebSocket.OnMessage:Wait()
+	until message.method == method
 	
 	return message
 end
