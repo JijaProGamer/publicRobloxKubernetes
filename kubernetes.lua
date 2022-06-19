@@ -56,7 +56,7 @@ local function waitForMessage(method)
 	local message
 	
 	repeat
-		message = WebSocket.OnMessage:Wait()
+		message = HttpService:JSONDecode(WebSocket.OnMessage:Wait())
 		print(message.method)
 	until message.method == method
 	
@@ -70,7 +70,9 @@ kubernetes.init = function(ip)
 	WebSocket = websocketLibrary.connect(ip)
 	sendMessage({method = "register", isMaster = "auto"})
 	
-	WebSocket.OnMessage:Connect(handleMessage)
+	WebSocket.OnMessage:Connect(function(msg)
+		handleMessage(HttpService:JSONDecode(msg))
+	end)
 end
 
 kubernetes.loadScript = function(target, scriptToSend)
