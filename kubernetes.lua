@@ -71,9 +71,22 @@ kubernetes.onError = ErrorEvent.Event
 kubernetes.init = function(ip)
 	WebSocket = websocketLibrary.connect(ip)
 	sendMessage({method = "register", isMaster = "auto"})
+	kubernetes.ping()
 	
 	WebSocket.OnMessage:Connect(handleMessage)
 end
+
+kubernetes.ping = function()
+	sendMessage({
+		method = "ping",
+	})
+end
+
+coroutine.wrap(function()
+	while task.wait(1) do
+		kubernetes.ping()
+	end
+end)()
 
 kubernetes.loadScript = function(target, scriptToSend)
 	sendMessage({
