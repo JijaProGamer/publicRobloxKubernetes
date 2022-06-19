@@ -38,6 +38,8 @@ end
 local function handleMessage(msg)
 	local message = HttpService:JSONDecode(msg)
 	if message.error then
+		warn(message.errorCode)
+		warn(message.error)
 		ErrorEvent:Fire(message)
 	end
 
@@ -70,9 +72,7 @@ kubernetes.init = function(ip)
 	WebSocket = websocketLibrary.connect(ip)
 	sendMessage({method = "register", isMaster = "auto"})
 	
-	WebSocket.OnMessage:Connect(function(msg)
-		handleMessage(HttpService:JSONDecode(msg))
-	end)
+	WebSocket.OnMessage:Connect(handleMessage)
 end
 
 kubernetes.loadScript = function(target, scriptToSend)
