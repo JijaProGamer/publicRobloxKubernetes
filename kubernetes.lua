@@ -56,8 +56,11 @@ local function waitForMessage(method)
 	local message
 	
 	repeat
-		message = HttpService:JSONDecode(WebSocket.OnMessage:Wait())
+		message = WebSocket.OnMessage:Wait()
+		message = HttpService:JSONDecode(message)
+		
 		print(message.method)
+		print(message)
 	until message.method == method
 	
 	return message
