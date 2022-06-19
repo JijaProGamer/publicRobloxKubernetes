@@ -57,6 +57,7 @@ local function waitForMessage(method)
 	
 	repeat
 		message = WebSocket.OnMessage:Wait()
+		print(message.method)
 	until message.method == method
 	
 	return message
